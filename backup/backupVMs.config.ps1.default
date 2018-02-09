@@ -1,0 +1,39 @@
+﻿###########################################################################
+# Konfiguration
+###########################################################################
+
+# Wohin sollen die VMs exportiert und zwischengespeichert werden?
+$Global:Exportpfad = "{PATH_FOR_EXPORT}$env:Computername"
+# Wohin sollen die ZIPs zur Archivierung gespeichert werden?
+$Global:Archivpfad = "{PATH_FOR_ARCHIVE}"
+# Wo sollen die Protokolle gespeichert werden?
+$Global:Logpfad = "{PATH_FOR_LOG}"
+# Sollen einzelne Schritte auf der Konsole ausgegeben werden?
+$Global:verbose = $true 
+
+$folder = "C:\test"
+
+
+#oldest file to be allowed being 7 days
+$noDays = 7
+
+#at least 7 backups have to exist, otherwise no check for date diff will be undertaken
+$minNoBackups = 7
+
+###########################################################################
+# Monitoring
+###########################################################################
+
+###########Define Variables########
+
+$fromaddress = "{EMAIL_FROM_ADDRESS_FOR_MONITORING}"
+$smtpAddPW = "{SMPT_PASSWORD}"
+$smtpMonitoringAdd = "{EMAIL_RECIEVE_MONITORING}"
+
+$toaddress = "{EMAIL_RECIEVE_MONITORING_2}"
+$Subject = "Backup Hyper-V host: $env:Computername"
+# $body = get-content .\content.htm
+$body = "<h1>Backup</h1><br/>"
+$smtpserver = "{SMPT_SERVER_MONITORING}"
+
+####################################
