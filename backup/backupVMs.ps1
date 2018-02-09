@@ -184,7 +184,9 @@ $message.body = $body
 $smtp = new-object Net.Mail.SmtpClient($smtpserver, 25)
 
 #$smtp.EnableSsl = $true 
-$smtp.Credentials = New-Object System.Net.NetworkCredential($smtpMonitoringAdd, $smtpAddPW); 
+if ($smtpAddPW -ne ""){
+    $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpMonitoringAdd, $smtpAddPW)
+}
 
 $smtp.Send($message)
 
