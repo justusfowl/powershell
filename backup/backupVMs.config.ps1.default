@@ -13,6 +13,9 @@ $Global:verbose = $true
 
 $folder = "C:\test"
 
+$CoreVMs = @("SERVER1", "SERVER2")
+$testServer = "Testserver"
+
 
 #oldest file to be allowed being 7 days
 $noDays = 7

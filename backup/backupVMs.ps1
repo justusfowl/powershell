@@ -14,6 +14,7 @@ param(
 
 )
 
+*> $Global:Logdatei
 
 ###########################################################################
 # Config
@@ -135,12 +136,14 @@ if ($flagAllVMs -eq $true){
 
 }ElseIf ($flagCoreVMs -eq $true){
 
-    . BackupVM("ERBACH-DC")
-    . BackupVM("ERBACH-TS")
+    ForEach ($VM in $CoreVMs) {
+     . BackupVM($VM)
+    }
     
 }ElseIf ($flagIsTest -eq $true){
 
-    . BackupVM("Testserver")
+    . BackupVM($testServer)
+
     
 }else{
     ForEach ($VM in $VMs) {    
