@@ -14,6 +14,7 @@ param(
 
 )
 
+
 ###########################################################################
 # Config
 ###########################################################################
@@ -22,9 +23,15 @@ $configFile = "backupVMs.config.ps1"
 $scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $configPath = join-path -path $scriptDir -childpath $configFile
 
+. $configPath
+
+Start-Transcript -Path $Global:Logpfad -append
+
 echo "Import config file: $configPath"
 
-. $configPath
+echo "Overview over export target drive" 
+
+gdr -Name $Global:Exportpfad.substring(0,1)
 
 ###########################################################################
 # Funktionen
@@ -36,7 +43,12 @@ Function Protokoll ([string]$Protokolltext="",[string]$currVM="General") {
     }
     $temp1 = (Get-Date)
     $temp2 = $Protokolltext
-    "$temp1 - $currVM - $temp2" | Out-File $Global:Logdatei -Append
+    Write-Host "$temp1 - $currVM - $temp2"
+
+    $body += "<br>"
+	$body += "$temp1 - $currVM - $temp2"
+
+    #"$temp1 - $currVM - $temp2" | Out-File $Global:Logdatei -Append
 }
 
 Function BackupVM ([string]$VM) {
@@ -119,8 +131,8 @@ $TargetExportFolder = "${Global:Exportpfad}\Export_${LogDateiDatum}"
     
 $ExportPfadVorhanden = Test-Path $TargetExportFolder
 if ($ExportPfadVorhanden -eq $true) { 
-    . Protokoll "Exportordner zuerst löschen, um sauberen Export zu erlangen: $Global:Exportpfad\$VM" $VM
-    Remove-Item -Recurse -Force $Global:Exportpfad\$VM    
+    . Protokoll "Exportordner zuerst löschen, um sauberen Export zu erlangen: $TargetExportFolder"
+    Remove-Item -Recurse -Force $TargetExportFolder    
 }else{
     New-Item -ItemType directory -Path $TargetExportFolder
 }
@@ -136,16 +148,16 @@ if ($flagAllVMs -eq $true){
 
     ForEach ($VM in $CoreVMs) {
      . BackupVM($VM)
+
     }
     
 }ElseIf ($flagIsTest -eq $true){
 
     . BackupVM($testServer)
-
     
 }else{
     ForEach ($VM in $VMs) {    
-        . BackupVM($VM)
+       . BackupVM($VM)
     }
 }
 
@@ -156,12 +168,25 @@ if ($flagAllVMs -eq $true){
 
 . Protokoll "Backup of all VMs complete, prepare cleaning up maintaining the last $noDays days of backups"
 
-get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
-    remove-item $Global:Exportpfad\$_ -force -whatif
-    . Protokoll "remove item $Global:Exportpfad\$_"
+$countBackups = (Get-ChildItem -Path $Global:Exportpfad -Directory -Recurse -Force).Count
+
+if ($countBackups -ge $minNoBackups){
+    
+    get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
+        remove-item $Global:Exportpfad\$_ -force -whatif
+        . Protokoll "remove item $Global:Exportpfad\$_"
+    }
+
+    . Protokoll "Cleanup of old backups complete, prepare Mailsending"
+
+}else {
+
+    . Protokoll "Cleanup skipped, $countBackups exists"
 }
 
-. Protokoll "Cleanup of old backups complete, prepare Mailsending"
+. Protokoll "Overall done for $LogDateiDatum, send mail..."
+
+Stop-Transcript
 
 ###########################################################################
 # Sending mail about monitoring
@@ -191,4 +216,5 @@ if ($smtpAddPW -ne ""){
 
 $smtp.Send($message)
 
-. Protokoll "Overall done for $LogDateiDatum"
+
+
