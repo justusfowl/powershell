@@ -116,8 +116,31 @@ Function BackupVM ([string]$VM) {
 	$body += $VM
 }
 
+
 ###########################################################################
-# Ausführung
+# Cleanup of older backup files
+###########################################################################
+
+. Protokoll "Backup of all VMs complete, prepare cleaning up maintaining the last $noDays days of backups"
+
+$countBackups = (Get-ChildItem -Path $Global:Exportpfad -Directory -Recurse -Force).Count
+
+if ($countBackups -ge $minNoBackups){
+    
+    get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
+        remove-item $Global:Exportpfad\$_ -force
+        . Protokoll "remove item $Global:Exportpfad\$_"
+    }
+
+    . Protokoll "Cleanup of old backups complete, prepare Mailsending"
+
+}else {
+
+    . Protokoll "Cleanup skipped, $countBackups exists"
+}
+
+###########################################################################
+# Ausführung Backup
 ###########################################################################
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -162,27 +185,6 @@ if ($flagAllVMs -eq $true){
 }
 
 
-###########################################################################
-# Cleanup of older backup files
-###########################################################################
-
-. Protokoll "Backup of all VMs complete, prepare cleaning up maintaining the last $noDays days of backups"
-
-$countBackups = (Get-ChildItem -Path $Global:Exportpfad -Directory -Recurse -Force).Count
-
-if ($countBackups -ge $minNoBackups){
-    
-    get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
-        remove-item $Global:Exportpfad\$_ -force -whatif
-        . Protokoll "remove item $Global:Exportpfad\$_"
-    }
-
-    . Protokoll "Cleanup of old backups complete, prepare Mailsending"
-
-}else {
-
-    . Protokoll "Cleanup skipped, $countBackups exists"
-}
 
 . Protokoll "Overall done for $LogDateiDatum, send mail..."
 
