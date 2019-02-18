@@ -19,13 +19,16 @@ param(
 # Config
 ###########################################################################
 
+# Logging des Vorgangs
+$LogDateiDatum = Get-Date -Format yyyy-MM-dd
+
 $configFile = "backupVMs.config.ps1"
 $scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $configPath = join-path -path $scriptDir -childpath $configFile
 
 . $configPath
 
-Start-Transcript -Path $Global:Logpfad -append
+Start-Transcript -Path $Global:Logpfad\BackupVM-$LogDateiDatum.log -append
 
 echo "Import config file: $configPath"
 
@@ -145,8 +148,7 @@ if ($countBackups -ge $minNoBackups){
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Logging des Vorgangs
-$LogDateiDatum = Get-Date -Format yyyy-MM-dd
+
 
 # Falls Export-Ordner vorhanden, erst löschen sonst erstellen    
 
