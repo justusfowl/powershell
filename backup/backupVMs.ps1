@@ -26,7 +26,7 @@ if ([string]::IsNullOrEmpty($PathConfigFile)){
 
 }
 
-$configFile = "backupVMs.config.ps1"
+$configFile = $PathConfigFile
 $scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $configPath = join-path -path $scriptDir -childpath $configFile
 
