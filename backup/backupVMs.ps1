@@ -4,13 +4,14 @@
 # Parameters
 ###########################################################################
 
-param(
+param( 
 [Parameter(Position = 0)]
 
 [string[]]$VMs,
 [switch]$flagAllVMs = $false,
 [switch]$flagIsTest = $false,
-[switch]$flagCoreVMs = $false
+[switch]$flagCoreVMs = $false,
+[string]$PathConfigFile
 
 )
 
@@ -19,16 +20,19 @@ param(
 # Config
 ###########################################################################
 
-# Logging des Vorgangs
-$LogDateiDatum = Get-Date -Format yyyy-MM-dd
+if ([string]::IsNullOrEmpty($PathConfigFile)){
+    Write-Error "Please provide a valid path to the config file"
+    return
 
-$configFile = "backupVMs.config.ps1"
+}
+
+$configFile = $PathConfigFile
 $scriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $configPath = join-path -path $scriptDir -childpath $configFile
 
 . $configPath
 
-Start-Transcript -Path $Global:Logpfad\BackupVM-$LogDateiDatum.log -append
+Start-Transcript -Path $Global:Logpfad -append
 
 echo "Import config file: $configPath"
 
@@ -148,7 +152,8 @@ if ($countBackups -ge $minNoBackups){
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-
+# Logging des Vorgangs
+$LogDateiDatum = Get-Date -Format yyyy-MM-dd
 
 # Falls Export-Ordner vorhanden, erst löschen sonst erstellen    
 
