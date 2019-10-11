@@ -1,6 +1,6 @@
 # @Author: JustusFowl
 
-$configFilePath = "C:\scripts\powershell\backup\backupVMs.config.ps1"
+$configFilePath = "backupVMs.config.ps1"
 
 $arg = -join('-NoProfile -WindowStyle Hidden -File "C:\scripts\powershell\backup\backupVMs.ps1" -flagCoreVMs -PathConfigFile "', $configFilePath, '"')
 
