@@ -135,7 +135,8 @@ $countBackups = (Get-ChildItem -Path $Global:Exportpfad -Directory -Recurse -For
 if ($countBackups -ge $minNoBackups){
     
     get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
-        remove-item $Global:Exportpfad\$_ -force -Recurse
+        # remove-item $Global:Exportpfad\$_ -force -Recurse
+	cmd.exe /c  "rd /s /q $Global:Exportpfad\$_"
         . Protokoll "remove item $Global:Exportpfad\$_"
     }
 
