@@ -70,7 +70,7 @@ Function BackupVM ([string]$VM) {
         $Global:Logdatei = "${env:homedrive}\temp\BackupVM-$LogDateiDatum.log" 
     } else { 
         $Global:Logdatei = "$Global:Logpfad\BackupVM-$LogDateiDatum.log"
-        New-Item $Global:Logdatei -type file 
+        # New-Item $Global:Logdatei -type file 
     }
 
     # Startzeit ausgeben
@@ -136,7 +136,7 @@ if ($countBackups -ge $minNoBackups){
     
     get-childitem $Global:Exportpfad |? {$_.psiscontainer -and $_.lastwritetime -le (get-date).adddays(-$noDays)} |% {
         # remove-item $Global:Exportpfad\$_ -force -Recurse
-	cmd.exe /c  "rd /s /q $Global:Exportpfad\$_"
+		cmd.exe /c  "rd /s /q $Global:Exportpfad\$_"
         . Protokoll "remove item $Global:Exportpfad\$_"
     }
 
